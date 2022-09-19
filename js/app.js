@@ -5,9 +5,17 @@ let tweets = [];
 // Event Listeners
 eventListeners();
 function eventListeners() {
+  //cuando el usuario agrega un nuevo tweet
   formulario.addEventListener("submit", agregarTweet);
+
+  //cuando el documento esta listo
+  document.addEventListener("DOMContentLoaded", () => {
+    tweets = JSON.parse(localStorage.getItem("tweets")) || [];
+    console.log(tweets);
+    crearHTML();
+  });
 }
-//functios
+//function
 function agregarTweet(e) {
   e.preventDefault();
 
@@ -26,7 +34,6 @@ function agregarTweet(e) {
   //Añadir al arreglo de tweets
 
   tweets = [...tweets, tweetObj];
-  console.log(tweets);
 
   //una vez agregado mis tweets a mi arreglo, ahora vamos a mostrarlos en el
   //HTML
@@ -56,13 +63,38 @@ function mostrarError(error) {
 function crearHTML() {
   //limpiar Html
   limpiarHTML();
-  if (tweets.length > 0)
+  if (tweets.length > 0) {
     tweets.forEach((tweet) => {
+      //agregar un boton
+      const btnEliminar = document.createElement("a");
+      btnEliminar.classList.add("borrar-tweet");
+      btnEliminar.innerText = "delete tweet";
+      // añadimos la funcion que eliminar los tweets
+      btnEliminar.onclick = () => {
+        borrarTweet(tweet.id);
+      };
+
       //crear el HTML
       const li = document.createElement("li");
       li.innerText = tweet.tweet; // porque es un arreglo de objetos y estoy usando el forEach
+      //asignar al boton
+      li.appendChild(btnEliminar);
+
+      //insertarlo en el html
       listaTweets.appendChild(li);
     });
+  }
+  sincronizarStorage();
+}
+//agrega los tweets actuales a local Storage
+function sincronizarStorage() {
+  localStorage.setItem("tweets", JSON.stringify(tweets));
+}
+//eliminar un tweet
+function borrarTweet(id) {
+  tweets = tweets.filter((tweet) => tweet.id !== id);
+  console.log(tweets);
+  crearHTML();
 }
 
 // limpiar el html
